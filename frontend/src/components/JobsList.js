@@ -16,44 +16,32 @@ function JobsList({ jobs }) {
       <h1>All Jobs</h1>
       <ul className={classes.list}>
         {jobs && jobs.map((job) => (
-            
-            // <li key={job.id} className={classes.item}>
-            //   <Link to={job.id} className={classes.link}>
-            //     <img src={job.image} alt={job.title} />
-            //     <div className={classes.content}>
-            //       <h2>{job.title}</h2>
-            //       <time>{job.date}</time>
-            //     </div>
-            //     <div className={classes.btn_container}>
-            //       <button className={classes.custom_btn} onClick={() => alert('this Job is a fraud')}>Apply</button>
-            //     </div>
-            //   </Link>
-            // </li>
             <li key={job.id} className={classes.item}>
-  <div className={classes.jobRow}>
-    <div className={classes.imageContainer}>
-      <img src={job.image} alt={job.title} />
-    </div>
+              <div className={classes.jobRow}>
+                <div className={classes.imageContainer}>
+                  {/* <img src={job.image} alt={job.title} /> */}
+                  <h6>Location: {job.location}</h6>
+                  <h6>Type: {job.employment_type}</h6>
+                  <h6>Exp: {job.required_experience}</h6>
+                  <h6>Ed: {job.required_education}</h6>
+                </div>
 
-    <div className={classes.details}>
-      <Link to={job.id} className={classes.link}>
-        <h2>{job.title}</h2>
-        <time>{job.date}</time>
-      </Link>
-      <p>{truncateWords(job.description)}</p>
-      <div className={classes.btn_container}>
-        <button
-          className={classes.custom_btn}
-          onClick={() => predictJobFraud(job)}
-        >
-          Apply
-        </button>
-      </div>
-    </div>
-  </div>
-</li>
-
-
+                <div className={classes.details}>
+                  <Link to={`/jobs/${job.job_id}`} className={classes.link}>
+                    <h2>{job.title}</h2>
+                    <time>{job.date}</time>
+                  </Link>
+                  <p>{truncateWords(job.description)}</p>
+                  <div className={classes.btn_container}>
+                    <button
+                      className={classes.custom_btn}
+                      onClick={() => predictJobFraud(job)}>
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </li>
         ))}
       </ul>
     </div>
@@ -64,29 +52,20 @@ function JobsList({ jobs }) {
 
 export async function predictJobFraud(job) {
     let isFraud;
-    // Define the job data to send for prediction
-    // MAKE SURE these feature names and types match your Python's JobFeatures Pydantic model exactly!
-    const jobData = {
-        job_title_length: 50,
-        description_word_count: 250,
-        salary_deviation_factor: 1.5,
-        contains_suspicious_keywords: 0, 
-        company_info_missing: 1  
-    };
 
     // The URL of your Node.js backend API
     const NODE_API_URL = 'http://localhost:8080/jobs/predict-job-fraud';
 
     try {
         const response = await fetch(NODE_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json', // Request JSON response
-                'Authorization': 'Bearer ' + token,
-            },
-            body: JSON.stringify(job) // Convert the JS object to a JSON string
-        });
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json', // Request JSON response
+              'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify(job) // Convert the JS object to a JSON string
+      });
 
         const result = await response.json(); // Parse the JSON response from Node.js
 

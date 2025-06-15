@@ -2,6 +2,7 @@ import { Form, redirect, useNavigate, useNavigation } from 'react-router-dom';
 
 import classes from './JobForm.module.css';
 import { getAuthToken } from '../util/auth';
+import { API_URL } from '../util/constants';
 
 function JobForm({ method, job }) {
   console.log('method', method);
@@ -57,7 +58,7 @@ export async function changeEventAction({ request, params }) {
   };
   console.log(job);
 
-  let url = 'http://localhost:8080/jobs';
+  let url = `${API_URL}/jobs`;
   if (method === 'PATCH') {
     url += '/' + params.id;
   }

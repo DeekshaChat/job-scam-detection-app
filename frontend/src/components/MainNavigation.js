@@ -1,7 +1,6 @@
 import { Form, NavLink, useRouteLoaderData } from 'react-router-dom';
 
 import classes from './MainNavigation.module.css';
-import NewsletterSignup from './NewsletterSignup';
 
 function MainNavigation() {
 
@@ -35,16 +34,6 @@ console.log('token====', token);
               Jobs
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/newsletter"
-              className={({ isActive }) =>
-                isActive ? classes.active : undefined
-              }
-            >
-              Newsletter
-            </NavLink>
-          </li>
           {!token && 
             (
               <li>
@@ -63,16 +52,13 @@ console.log('token====', token);
             token && (
             <li>
               <Form method="post" action="/logout">
-                <button>Logout</button>
+                <button className={classes.logout_btn}>Logout</button>
               </Form>
             </li>
             )
           }
-
-
         </ul>
       </nav>
-      <NewsletterSignup />
     </header>
   );
 }

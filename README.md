@@ -9,7 +9,7 @@ The project contains three seperate project one is frontend, second is backend a
         this project provides all the data to the frontend to make it dynamic. IT also interact with prediction-model to distinguish between fraudulent jobs and genuine jobs
 
     predictive-model:
-        this project ------
+        this project predicts the job fraud and allows user to see before applying that a job is fraud or genuine
 
 
 This project allows users to apply for jobs and secure them to apply for scam jobs and save their data

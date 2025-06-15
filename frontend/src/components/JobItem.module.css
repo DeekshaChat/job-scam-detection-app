@@ -1,12 +1,10 @@
 .event {
   max-width: 50rem;
   margin: 2rem auto;
-  text-align: center;
 }
 
-.event img {
-  width: 30rem;
-  border-radius: 4px;
+.event h1 {
+   text-align: center;
 }
 
 .actions {
@@ -30,3 +28,5 @@
   border: none;
   color: var(--color-primary-800);
 }
+
+

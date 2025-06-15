@@ -33,7 +33,7 @@ function VisualDashboardPage() {
   
 
   return (
-    <div style={{justifyContent: 'center', alignItems: 'center', alignContent: 'center', backgroundColor: '#ffffe0', flex: 1, width: '100%'}}>
+    <div style={{justifyContent: 'center', alignItems: 'center', alignContent: 'center', flex: 1, width: '100%'}}>
       <VisualizationSelector
         visualizationTypes={visuals}
         handleSelectedVisual={handleSelectedVisual} />

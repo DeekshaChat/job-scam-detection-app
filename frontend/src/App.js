@@ -8,7 +8,6 @@ import RootLayout from "./RootLayout";
 import JobsLayout from "./JobsLayout";
 import ErrorPage from "./pages/ErrorPage";
 import { changeEventAction } from "./components/JobForm";
-import NewsletterPage, { newsletterAction } from './pages/NewsletterPage';
 import AuthenticationPage, { authAction } from "./pages/AuthenticationPage";
 import { checkAuthLoader, logoutAction, tokenLoader } from "./pages/Logout";
 import VisualDashboardPage, { visualsLoader } from "./pages/VisualDashboardPage";
@@ -61,11 +60,6 @@ const router = createBrowserRouter([
           },
 
         ]
-      },
-      {
-        path: 'newsletter',
-        element: <NewsletterPage />,
-        action: newsletterAction,
       },
        {
         path: 'visuals',

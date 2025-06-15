@@ -2,6 +2,7 @@ import React from 'react'
 import JobForm from '../components/JobForm'
 import { redirect } from 'react-router';
 import { getAuthToken } from '../util/auth';
+import { API_URL } from '../util/constants';
 
 export default function NewEventPage() {
   return (
@@ -20,7 +21,7 @@ export async function newEventAction({ request, params }) {
   console.log(event);
   const token = getAuthToken();
 
-  const response = await fetch('http://localhost:8080/jobs', {
+  const response = await fetch(`${API_URL}/jobs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

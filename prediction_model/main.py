@@ -8,6 +8,7 @@ import os
 import logging # For better logging than just print()
 import plotly.express as px
 import json
+import numpy as np
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -162,7 +163,7 @@ async def predict_fraud(request: JobFeatures):
 @app.get("/visuals/{id}")
 async def visual_of_jobs(id: str):
     try:
-        # logger.info('request=====', {id})
+        logger.info(f'request====={id}')
         # logger.info('visual api call at prediction model')
         global dashboard_data_df
 
@@ -177,43 +178,125 @@ async def visual_of_jobs(id: str):
             })
 
         try:
+            
             # --- Dashboard Metrics and Charts ---
             total_jobs = len(dashboard_data_df)
             fraudulent_jobs = dashboard_data_df[dashboard_data_df['fraudulent']].shape[0]
             percentage_fraud = (fraudulent_jobs / total_jobs) * 100 if total_jobs > 0 else 0
 
-            # Chart 1: Fraudulent Jobs by Industry (Bar Chart)
-            # Ensure 'industry' column exists and handle NaNs if necessary
-            # We already handled 'industry' column during startup load, but good to be safe
-            dashboard_data_df['industry'] = dashboard_data_df['industry'].fillna('Unknown')
-            fraud_by_industry = dashboard_data_df[dashboard_data_df['fraudulent']].groupby('industry').size().reset_index(name='count')
-            fig_industry = px.bar(
-                fraud_by_industry,
-                x='industry',
-                y='count',
-                title='Fraudulent Jobs by Industry (from Training Data)',
-                labels={'count': 'Number of Fraudulent Jobs', 'industry': 'Industry'}
-            )
-            # plot_industry_json = fig_industry.to_dict()
-             # --- CHANGE IS HERE: Use fig_industry.to_json() ---
-            plot_industry_json_string = fig_industry.to_json()
-            # If you need it as a Python dictionary, you can load it back
-            plot_industry_json = json.loads(plot_industry_json_string)
+            if id == 'bar':
+                # Chart 1: Fraudulent Jobs by Industry (Bar Chart)
+                # Ensure 'industry' column exists and handle NaNs if necessary
+                # We already handled 'industry' column during startup load, but good to be safe
+                dashboard_data_df['industry'] = dashboard_data_df['industry'].fillna('Unknown')
+                fraud_by_industry = dashboard_data_df[dashboard_data_df['fraudulent']].groupby('industry').size().reset_index(name='count')
+                fig_industry = px.bar(
+                    fraud_by_industry,
+                    x='industry',
+                    y='count',
+                    title='Fraudulent Jobs by Industry (from Training Data)',
+                    labels={'count': 'No of Fraud Jobs', 'industry': 'Industry'}
+                )
+                # plot_industry_json = fig_industry.to_dict()
+                # --- CHANGE IS HERE: Use fig_industry.to_json() ---
+                plot_industry_json_string = fig_industry.to_json()
+                # If you need it as a Python dictionary, you can load it back
+                plot_industry_json = json.loads(plot_industry_json_string)
+                return plot_industry_json
+            
+            elif id == 'pie':
+                genuine = total_jobs - fraudulent_jobs
+                df = pd.DataFrame({
+                    'Type': ['Total Fraudulent', 'Total Genuine'],
+                    'Count': [fraudulent_jobs, genuine]
+                })
+                custom_colors = {
+                    'Total Fraudulent': '#FFC300',  # brighter and visible yellow
+                    'Total Genuine': '#D64550'      # theme red
+                }
+                fig_pie = px.pie(
+                    df,
+                    names='Type',
+                    values='Count',
+                    title='Fraudulent Distribution',
+                    color='Type',
+                    color_discrete_map=custom_colors
+                )
 
-            # Chart 2: Trend of Fraudulent Jobs Over Time (Line Chart)
-            # Aggregate daily fraud counts
-            # We already ensured 'timestamp' is datetime during startup load
-            # #fraud_trend = dashboard_data_df[dashboard_data_df['fraudulent']].groupby(dashboard_data_df['timestamp'].dt.date).size().reset_index(name='count')
-            # fraud_trend = dashboard_data_df[dashboard_data_df['fraudulent']].size().reset_index(name='count')
-            # fraud_trend['date'] = pd.to_datetime(fraud_trend['date']) # Convert back to datetime for plotting for Plotly
-            # fig_trend = px.line(
-            #     fraud_trend,
-            #     x='date',
-            #     y='count',
-            #     title='Daily Fraudulent Job Count (from Training Data)',
-            #     labels={'count': 'Number of Fraudulent Jobs', 'date': 'Date'}
-            # )
-            # plot_trend_json = fig_trend.to_dict()
+                plot_pie_json_string = fig_pie.to_json()
+                # If you need it as a Python dictionary, you can load it back
+                plot_pie_json = json.loads(plot_pie_json_string)
+                return plot_pie_json
+            
+            elif id == 'line':
+                # Chart 2: Trend of Fraudulent Jobs Over Time (Line Chart)
+                # Aggregate daily fraud counts
+                # We already ensured 'timestamp' is datetime during startup load
+                #fraud_trend = dashboard_data_df[dashboard_data_df['fraudulent']].groupby(dashboard_data_df['timestamp'].dt.date).size().reset_index(name='count')
+                fraud_trend = dashboard_data_df[dashboard_data_df['fraudulent']].size().reset_index(name='count')
+                fraud_trend['date'] = pd.to_datetime(fraud_trend['date']) # Convert back to datetime for plotting for Plotly
+                fig_trend = px.line(
+                    fraud_trend,
+                    x='date',
+                    y='count',
+                    title='Daily Fraudulent Job Count (from Training Data)',
+                    labels={'count': 'Number of Fraudulent Jobs', 'date': 'Date'}
+                )
+                # plot_trend_json = fig_trend.to_dict()
+                 # --- CHANGE IS HERE: Use fig_industry.to_json() ---
+                plot_trend_json_string = fig_trend.to_json()
+                # If you need it as a Python dictionary, you can load it back
+                plot_trend_json = json.loads(plot_trend_json_string)
+                return plot_trend_json
+            
+            elif id == 'scatter':
+                # Create a dummy 'Genuine' column for stacking
+                dashboard_data_df['Genuine'] = np.maximum(dashboard_data_df['Sum of fraud_probability'].max() - dashboard_data_df['Sum of fraud_probability'], 0)
+
+                # Sort data by function (optional for better visuals)
+                dashboard_data_df = dashboard_data_df.dropna().sort_values('function')
+
+                fig_scatter = px.scatter(
+                    x=dashboard_data_df['function'],
+                    y=dashboard_data_df['Sum of fraud_probability'],
+                    name='Fraudulent',
+                    mode='lines',
+                    stackgroup='one',
+                    line=dict(color='yellow')
+                )
+                fig = px.Figure()
+                # Fraudulent in Yellow
+                fig.add_trace(px.Scatter(
+                    x=dashboard_data_df['function'],
+                    y=dashboard_data_df['Sum of fraud_probability'],
+                    name='Fraudulent',
+                    mode='lines',
+                    stackgroup='one',
+                    line=dict(color='yellow')
+                ))
+
+                # Genuine in #D64550
+                fig.add_trace(px.Scatter(
+                    x=dashboard_data_df['function'],
+                    y=dashboard_data_df['Genuine'],
+                    name='Genuine',
+                    mode='lines',
+                    stackgroup='one',
+                    line=dict(color='#D64550')
+                ))
+
+                fig.update_layout(
+                    title='Function vs Fraud (Stacked Area Chart)',
+                    xaxis_title='Function',
+                    yaxis_title='Sum of Fraud Probability',
+                    legend_title='Type',
+                    hovermode='x unified'
+                )
+
+                plot_scatter_json_string = fig_scatter.to_json()
+                # If you need it as a Python dictionary, you can load it back
+                plot_scatter_json = json.loads(plot_scatter_json_string)
+                return plot_scatter_json
 
             # return {
                 # "total_fraud_jobs": fraudulent_jobs,
@@ -222,7 +305,7 @@ async def visual_of_jobs(id: str):
                 # "trend_chart": plot_trend_json
                 # Add more charts here as needed
             # }
-            return plot_industry_json
+            
         except Exception as e:
             logger.error(f"Error in get_job_visuals: {e}", exc_info=True)
             

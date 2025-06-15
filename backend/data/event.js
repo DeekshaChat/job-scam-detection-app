@@ -23,7 +23,7 @@ async function get(id) {
     throw new NotFoundError('Could not find any jobs.');
   }
 
-  const job = storedData.jobs.find((ev) => ev.id === id);
+  const job = storedData.jobs.find((ev) => ev.job_id === id);
   if (!job) {
     throw new NotFoundError('Could not find job for id ' + id);
   }
