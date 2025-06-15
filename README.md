@@ -12,6 +12,11 @@ The project contains three seperate project one is frontend, second is backend a
         this project predicts the job fraud and allows user to see before applying that a job is fraud or genuine
 
 
+Requirements:
+    Node: 20.18.0 or above
+    Python: 3.XX
+    VSCode
+
 This project allows users to apply for jobs and secure them to apply for scam jobs and save their data
 
 In the project directory in backend and frontend folder, you can run:
@@ -56,5 +61,8 @@ After that run this command to start the prediction model
 
     uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-Now both the projects started now you can explore the app
+Now, All the projects started now you can explore the app and see the benefit of our app i detecting fraud jobs
+
+
+Also, do login/signup in app to get the maximum benefits
 
